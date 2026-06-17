@@ -8,22 +8,22 @@
       * { box-sizing: border-box; }
 
       body {
-        height: 6000px;
         margin: 0;
-        background: #000;
+        background: #000d1a;
         overflow-x: hidden;
         font-family: 'Segoe UI', system-ui, sans-serif;
       }
 
-      /* ── fixed scene wrapper ─────────────────────────────────────── */
-      #scene-wrap {
-        position: fixed;
+      /* A-Frame scene: fixed fullscreen behind everything */
+      a-scene {
+        position: fixed !important;
         top: 0; left: 0;
-        width: 100%; height: 100%;
+        width: 100% !important;
+        height: 100% !important;
         z-index: 0;
       }
 
-      /* ── hero UI ─────────────────────────────────────────────────── */
+      /* hero title — fixed, fades on scroll */
       #ui {
         position: fixed;
         top: 8%;
@@ -31,604 +31,416 @@
         transform: translateX(-50%);
         color: white;
         text-align: center;
-        text-shadow: 2px 2px 8px rgba(0,0,0,0.7);
+        text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
         pointer-events: none;
-        z-index: 10;
+        z-index: 30;
         width: 90%;
-        transition: opacity 0.4s;
+        transition: opacity 0.3s;
       }
-      #ui h1 { font-size: clamp(2rem, 5vw, 3.5rem); margin: 0 0 0.3rem; letter-spacing: -0.5px; }
-      #ui p  { font-size: 1.1rem; opacity: 0.8; margin: 0; }
+      #ui h1 { font-size: clamp(2rem, 5vw, 3.4rem); margin: 0 0 0.4rem; letter-spacing: -0.5px; }
+      #ui p  { font-size: 1.1rem; opacity: 0.75; margin: 0; }
 
-      /* ── scroll content overlay ──────────────────────────────────── */
-      #content {
+      /* scroll hint arrow */
+      #scroll-hint {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        color: rgba(255,255,255,0.45);
+        font-size: 0.75rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        z-index: 30;
+        pointer-events: none;
+        animation: bob 2s ease-in-out infinite;
+      }
+      @keyframes bob {
+        0%,100% { transform: translateX(-50%) translateY(0); }
+        50%      { transform: translateX(-50%) translateY(7px); }
+      }
+
+      /* ── page scroll wrapper ── sits above fixed scene ── */
+      #page {
         position: relative;
         z-index: 20;
-        pointer-events: none; /* cards below turn this on */
-        margin-top: 100vh;    /* start after the scene */
+        /* first 100vh is "empty" so the scene shows through */
+        padding-top: 100vh;
       }
 
-      /* ── section cards ───────────────────────────────────────────── */
+      /* ── content sections ── */
       .section {
-        pointer-events: auto;
         max-width: 680px;
-        margin: 0 auto 6rem;
+        margin: 0 auto 5rem;
         padding: 0 1.5rem;
       }
 
       .card {
-        background: rgba(8, 12, 24, 0.82);
-        border: 1px solid rgba(80, 160, 255, 0.25);
+        background: rgba(4, 10, 28, 0.86);
+        border: 1px solid rgba(70, 140, 255, 0.28);
         border-radius: 16px;
         padding: 2rem 2.2rem;
-        backdrop-filter: blur(14px);
-        color: #e8eef8;
-        box-shadow: 0 0 40px rgba(30, 80, 200, 0.12);
-        transition: border-color 0.3s;
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        color: #dde8f8;
       }
-      .card:hover { border-color: rgba(80, 160, 255, 0.5); }
 
       .card-label {
-        font-size: 0.7rem;
-        font-weight: 600;
-        letter-spacing: 0.14em;
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
         text-transform: uppercase;
-        color: #5ab0ff;
-        margin: 0 0 0.6rem;
+        color: #5aabff;
+        margin: 0 0 0.5rem;
       }
       .card h2 {
-        font-size: clamp(1.4rem, 3vw, 2rem);
+        font-size: clamp(1.35rem, 2.5vw, 1.9rem);
         font-weight: 600;
+        color: #fff;
         margin: 0 0 1rem;
-        color: #ffffff;
-        line-height: 1.2;
+        line-height: 1.25;
       }
       .card p {
         font-size: 1rem;
-        line-height: 1.7;
-        color: #b0bfd4;
+        line-height: 1.72;
+        color: #9fb5d4;
         margin: 0 0 1rem;
       }
       .card p:last-child { margin-bottom: 0; }
 
-      /* ── stat row ────────────────────────────────────────────────── */
+      /* stats grid */
       .stats {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+        gap: 0.85rem;
         margin: 1.4rem 0;
       }
       .stat {
         background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(80,160,255,0.15);
+        border: 1px solid rgba(70,140,255,0.18);
         border-radius: 10px;
-        padding: 0.9rem 1rem;
+        padding: 0.85rem 0.7rem;
         text-align: center;
       }
-      .stat-num {
-        font-size: 1.8rem;
-        font-weight: 700;
-        color: #5ab0ff;
-        line-height: 1;
-      }
-      .stat-label {
-        font-size: 0.75rem;
-        color: #7090b0;
-        margin-top: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-      }
+      .stat-num   { font-size: 1.75rem; font-weight: 700; color: #5aabff; line-height: 1; }
+      .stat-label { font-size: 0.7rem; color: #607898; margin-top: 5px; letter-spacing: 0.07em; text-transform: uppercase; }
 
-      /* ── link list ────────────────────────────────────────────────── */
+      /* link grid */
       .link-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 0.75rem;
+        gap: 0.7rem;
         margin-top: 1.2rem;
       }
-      @media (max-width: 520px) { .link-grid { grid-template-columns: 1fr; } }
+      @media (max-width: 500px) { .link-grid { grid-template-columns: 1fr; } }
 
       .link-card {
         display: flex;
         align-items: flex-start;
-        gap: 0.75rem;
+        gap: 0.7rem;
         background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(80,160,255,0.18);
+        border: 1px solid rgba(70,140,255,0.2);
         border-radius: 10px;
-        padding: 0.85rem 1rem;
+        padding: 0.8rem 0.95rem;
         text-decoration: none;
         color: inherit;
         transition: background 0.2s, border-color 0.2s;
       }
-      .link-card:hover {
-        background: rgba(90,176,255,0.1);
-        border-color: rgba(90,176,255,0.45);
-      }
-      .link-icon {
-        font-size: 1.3rem;
-        flex-shrink: 0;
-        margin-top: 2px;
-      }
-      .link-title {
-        font-size: 0.92rem;
-        font-weight: 600;
-        color: #d0e4ff;
-        display: block;
-        margin-bottom: 2px;
-      }
-      .link-desc {
-        font-size: 0.78rem;
-        color: #7090b0;
-        line-height: 1.4;
-      }
+      .link-card:hover { background: rgba(90,171,255,0.1); border-color: rgba(90,171,255,0.45); }
+      .link-icon  { font-size: 1.25rem; flex-shrink: 0; margin-top: 1px; }
+      .link-title { font-size: 0.9rem; font-weight: 600; color: #c8dcf8; display: block; margin-bottom: 2px; }
+      .link-desc  { font-size: 0.76rem; color: #607898; line-height: 1.4; }
 
-      /* ── steps ────────────────────────────────────────────────────── */
+      /* steps */
       .steps { margin: 1.2rem 0 0; }
-      .step {
-        display: flex;
-        gap: 1rem;
-        margin-bottom: 1.2rem;
-      }
+      .step  { display: flex; gap: 1rem; margin-bottom: 1.15rem; }
       .step-num {
-        width: 32px; height: 32px;
-        border-radius: 50%;
-        background: rgba(90,176,255,0.15);
-        border: 1px solid rgba(90,176,255,0.4);
-        color: #5ab0ff;
-        font-size: 0.85rem;
-        font-weight: 700;
+        width: 30px; height: 30px; border-radius: 50%;
+        background: rgba(90,171,255,0.12);
+        border: 1px solid rgba(90,171,255,0.38);
+        color: #5aabff; font-size: 0.82rem; font-weight: 700;
         display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-        margin-top: 2px;
+        flex-shrink: 0; margin-top: 3px;
       }
-      .step-body h3 {
-        font-size: 0.97rem;
-        font-weight: 600;
-        color: #d0e4ff;
-        margin: 0 0 3px;
-      }
-      .step-body p {
-        font-size: 0.88rem;
-        color: #7090b0;
-        margin: 0;
-        line-height: 1.5;
-      }
+      .step-body h3 { font-size: 0.95rem; font-weight: 600; color: #c8dcf8; margin: 0 0 3px; }
+      .step-body p  { font-size: 0.86rem; color: #607898; margin: 0; line-height: 1.55; }
 
-      /* ── meetup badge ─────────────────────────────────────────────── */
+      /* meetup badge */
       .meetup-badge {
         display: inline-block;
-        background: rgba(255, 180, 40, 0.12);
-        border: 1px solid rgba(255,180,40,0.35);
-        border-radius: 8px;
-        color: #ffb428;
-        font-size: 0.78rem;
-        font-weight: 600;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        padding: 3px 10px;
-        margin-bottom: 0.7rem;
+        background: rgba(255,176,30,0.12);
+        border: 1px solid rgba(255,176,30,0.35);
+        border-radius: 7px;
+        color: #ffb41e;
+        font-size: 0.72rem; font-weight: 700;
+        letter-spacing: 0.12em; text-transform: uppercase;
+        padding: 3px 10px; margin-bottom: 0.7rem;
       }
 
-      /* ── CTA button ───────────────────────────────────────────────── */
+      .rule { border: none; border-top: 1px solid rgba(70,140,255,0.14); margin: 1.3rem 0; }
+
       .cta-btn {
         display: inline-block;
-        margin-top: 1.2rem;
-        padding: 0.65rem 1.6rem;
-        background: rgba(90,176,255,0.15);
-        border: 1px solid rgba(90,176,255,0.5);
+        margin-top: 1.1rem;
+        padding: 0.6rem 1.5rem;
+        background: rgba(90,171,255,0.13);
+        border: 1px solid rgba(90,171,255,0.45);
         border-radius: 8px;
-        color: #90caff;
-        font-size: 0.9rem;
-        font-weight: 600;
+        color: #8ac6ff;
+        font-size: 0.88rem; font-weight: 600;
         text-decoration: none;
         transition: background 0.2s;
-        pointer-events: auto;
       }
-      .cta-btn:hover { background: rgba(90,176,255,0.28); }
+      .cta-btn:hover { background: rgba(90,171,255,0.26); }
 
-      /* ── divider line ────────────────────────────────────────────── */
-      .rule {
-        border: none;
-        border-top: 1px solid rgba(80,160,255,0.12);
-        margin: 1.4rem 0;
-      }
+      strong.hl { color: #c8dcf8; }
 
-      /* ── canvas baseline ─────────────────────────────────────────── */
-      canvas { display: block; }
-
-      /* ── scroll hint ─────────────────────────────────────────────── */
-      #scroll-hint {
-        position: fixed;
-        bottom: 2.5rem;
-        left: 50%;
-        transform: translateX(-50%);
-        color: rgba(255,255,255,0.5);
-        font-size: 0.8rem;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        z-index: 30;
-        animation: bounce 2s infinite;
-        pointer-events: none;
-      }
-      @keyframes bounce {
-        0%, 100% { transform: translateX(-50%) translateY(0); }
-        50%       { transform: translateX(-50%) translateY(6px); }
-      }
+      /* bottom padding so last card doesn't stick to viewport bottom */
+      .bottom-pad { height: 10rem; }
     </style>
   </head>
   <body>
 
-    <!-- ── hero label ──────────────────────────────────────────────────── -->
+    <!-- fixed hero title -->
     <div id="ui">
       <h1>Automation Is Eating The World</h1>
       <p>Scroll to explore — drones, code, and the future of flight</p>
     </div>
-
     <div id="scroll-hint">↓ scroll</div>
 
-    <!-- ── fixed 3-D scene ────────────────────────────────────────────── -->
-    <div id="scene-wrap">
-      <a-scene embedded shadow="type: pcfsoft">
-        <a-assets>
-          <a-asset-item id="backpack-model" src="backpack.glb"></a-asset-item>
-        </a-assets>
+    <!-- A-Frame scene: CSS above makes this fixed fullscreen -->
+    <a-scene embedded shadow="type: pcfsoft">
+      <a-assets>
+        <a-asset-item id="backpack-model" src="backpack.glb"></a-asset-item>
+      </a-assets>
 
-        <a-entity environment="
-          preset: forest;
-          active: true;
-          seed: 8;
-          skyType: gradient;
-          skyColor: #0d1b3e;
-          horizonColor: #1a3a6e;
-          lighting: ambient;
-          ground: flat;
-          groundColor: #0a1428;
-          groundColor2: #081020;
-          dressingAmount: 40;
-          dressingColor: #1a2a4a;
-        "></a-entity>
+      <a-entity environment="
+        preset: forest;
+        active: true;
+        seed: 8;
+        skyType: gradient;
+        skyColor: #060e24;
+        horizonColor: #0d2045;
+        lighting: ambient;
+        ground: flat;
+        groundColor: #050c1c;
+        groundColor2: #04091a;
+        dressingAmount: 30;
+        dressingColor: #0e1f3a;
+      "></a-entity>
 
-        <a-light type="directional" position="-1 4 3" intensity="0.8" castShadow="true"></a-light>
-        <a-light type="ambient" intensity="0.35"></a-light>
-        <!-- accent blue point light -->
-        <a-light type="point" position="0 3 0" color="#3080ff" intensity="0.6"></a-light>
+      <a-light type="directional" position="-1 4 3" intensity="0.8" castShadow="true"></a-light>
+      <a-light type="ambient" intensity="0.35"></a-light>
+      <a-light type="point" position="0 2.5 1" color="#2266ff" intensity="0.7" distance="8"></a-light>
 
-        <a-cylinder
-          position="0 0.45 0"
-          radius="0.8"
-          height="0.9"
-          color="#111827"
-          roughness="0.8"
-          shadow="receive: true">
-        </a-cylinder>
+      <a-cylinder position="0 0.45 0" radius="0.8" height="0.9"
+        color="#0a1020" roughness="0.8" shadow="receive: true">
+      </a-cylinder>
 
-        <!-- floating text panels in 3-D space -->
-        <a-entity id="panel-1"
-          position="-3.5 2.5 -4"
-          rotation="0 25 0">
-          <a-plane width="2.2" height="1.1" color="#0a1428" opacity="0.88"
-            material="shader: flat; transparent: true; opacity: 0.88">
-          </a-plane>
-          <a-text value="Drone Collective" align="center" color="#5ab0ff"
-            position="0 0.28 0.01" width="2" font="dejavu"></a-text>
-          <a-text value="Monthly meetup · fly · automate" align="center" color="#7090b0"
-            position="0 -0.05 0.01" width="1.9" font="dejavu"></a-text>
-        </a-entity>
+      <!-- floating 3D label panels -->
+      <a-entity position="-3.2 2.6 -4" rotation="0 22 0">
+        <a-plane width="2.2" height="1" color="#040c20"
+          material="shader:flat; transparent:true; opacity:0.85"></a-plane>
+        <a-text value="Drone Collective" align="center" color="#5aabff"
+          position="0 0.25 0.01" width="2" font="dejavu"></a-text>
+        <a-text value="monthly meetup · fly · automate" align="center" color="#607898"
+          position="0 -0.1 0.01" width="1.9" font="dejavu"></a-text>
+      </a-entity>
 
-        <a-entity id="panel-2"
-          position="3.5 2.2 -5"
-          rotation="0 -30 0">
-          <a-plane width="2.4" height="1.1" color="#0a1428" opacity="0.88"
-            material="shader: flat; transparent: true; opacity: 0.88">
-          </a-plane>
-          <a-text value="MAVLink · ROS2 · ArduPilot" align="center" color="#ffb428"
-            position="0 0.28 0.01" width="2.2" font="dejavu"></a-text>
-          <a-text value="open-source flight stacks" align="center" color="#7090b0"
-            position="0 -0.05 0.01" width="2.1" font="dejavu"></a-text>
-        </a-entity>
+      <a-entity position="3.2 2.2 -5" rotation="0 -28 0">
+        <a-plane width="2.4" height="1" color="#040c20"
+          material="shader:flat; transparent:true; opacity:0.85"></a-plane>
+        <a-text value="MAVLink · ROS2 · ArduPilot" align="center" color="#ffb41e"
+          position="0 0.25 0.01" width="2.2" font="dejavu"></a-text>
+        <a-text value="open-source flight stacks" align="center" color="#607898"
+          position="0 -0.1 0.01" width="2.1" font="dejavu"></a-text>
+      </a-entity>
 
-        <a-entity id="panel-3"
-          position="0 4.2 -6"
-          rotation="0 0 0">
-          <a-plane width="2.6" height="1.1" color="#0a1428" opacity="0.88"
-            material="shader: flat; transparent: true; opacity: 0.88">
-          </a-plane>
-          <a-text value="Computer Vision" align="center" color="#a0ff80"
-            position="0 0.28 0.01" width="2.4" font="dejavu"></a-text>
-          <a-text value="AprilTags · OpenCV · YOLO" align="center" color="#7090b0"
-            position="0 -0.05 0.01" width="2.3" font="dejavu"></a-text>
-        </a-entity>
+      <a-entity position="0 4.4 -7">
+        <a-plane width="2.6" height="1" color="#040c20"
+          material="shader:flat; transparent:true; opacity:0.85"></a-plane>
+        <a-text value="Computer Vision" align="center" color="#40e080"
+          position="0 0.25 0.01" width="2.4" font="dejavu"></a-text>
+        <a-text value="AprilTags · OpenCV · YOLO" align="center" color="#607898"
+          position="0 -0.1 0.01" width="2.3" font="dejavu"></a-text>
+      </a-entity>
 
-        <!-- animated drone stand-in sphere while scene loads -->
-        <a-sphere id="drone-orb"
-          position="0 3.5 -2"
-          radius="0.18"
-          color="#3080ff"
-          material="shader: flat; opacity: 0.7"
-          animation="property: position; to: 0 3.8 -2; dur: 2000; dir: alternate; loop: true; easing: easeInOutSine">
-        </a-sphere>
+      <!-- pulsing drone orb -->
+      <a-sphere position="0 3.6 -2" radius="0.16" color="#2266ff"
+        material="shader:flat; opacity:0.65"
+        animation="property:position; to:0 3.95 -2; dur:2200; dir:alternate; loop:true; easing:easeInOutSine">
+      </a-sphere>
 
-        <a-entity
-          id="backpack"
-          gltf-model="#backpack-model"
-          position="0 0.9 0"
-          rotation="0 45 0"
-          scale="1.5 1.5 1.5"
-          shadow="cast: true"
-          scroll-morph-control>
-        </a-entity>
+      <a-entity id="backpack"
+        gltf-model="#backpack-model"
+        position="0 0.9 0"
+        rotation="0 45 0"
+        scale="1.5 1.5 1.5"
+        shadow="cast: true"
+        scroll-morph-control>
+      </a-entity>
 
-        <a-entity camera position="0 1.8 3.5" look-controls="enabled: false"></a-entity>
-      </a-scene>
-    </div>
+      <a-entity camera position="0 1.8 3.5" look-controls="enabled: false"></a-entity>
+    </a-scene>
 
-    <!-- ── scrollable HTML content ─────────────────────────────────────── -->
-    <div id="content">
+    <!-- ── scrollable page content (sits above fixed scene) ── -->
+    <div id="page">
 
-      <!-- ── 1. AUTOMATION IS EATING THE WORLD ──────────────────────── -->
+      <!-- 1. Big picture -->
       <div class="section">
         <div class="card">
           <p class="card-label">The big picture</p>
           <h2>Automation is eating the world</h2>
-          <p>
-            Marc Andreessen said software is eating the world. He was right — but the next
-            wave has rotors. Autonomous systems are moving from the data center into physical
-            space: warehouses, farmland, construction sites, search-and-rescue terrain.
-            Drones are the first mass-market robots most people will actually interact with.
-          </p>
+          <p>Marc Andreessen said software is eating the world. He was right — but the next wave has rotors. Autonomous systems are moving from the data center into physical space: warehouses, farmland, construction sites, search-and-rescue terrain. Drones are the first mass-market robots most people will actually interact with.</p>
           <div class="stats">
-            <div class="stat">
-              <div class="stat-num">$55B</div>
-              <div class="stat-label">drone market by 2030</div>
-            </div>
-            <div class="stat">
-              <div class="stat-num">1M+</div>
-              <div class="stat-label">registered pilots (US)</div>
-            </div>
-            <div class="stat">
-              <div class="stat-num">40%</div>
-              <div class="stat-label">jobs with automation exposure</div>
-            </div>
-            <div class="stat">
-              <div class="stat-num">2030</div>
-              <div class="stat-label">FAA UAS integration target</div>
-            </div>
+            <div class="stat"><div class="stat-num">$55B</div><div class="stat-label">drone market by 2030</div></div>
+            <div class="stat"><div class="stat-num">1M+</div><div class="stat-label">registered pilots (US)</div></div>
+            <div class="stat"><div class="stat-num">40%</div><div class="stat-label">jobs automation-exposed</div></div>
+            <div class="stat"><div class="stat-num">2030</div><div class="stat-label">FAA UAS integration</div></div>
           </div>
-          <p>
-            The tooling to build autonomous flight has never been more accessible.
-            A $30 microcontroller, an open flight stack, and a Python script can now do
-            what cost $100,000 a decade ago. This is the moment to learn.
-          </p>
+          <p>The tooling to build autonomous flight has never been more accessible. A $30 microcontroller, an open flight stack, and a Python script can now do what cost $100,000 a decade ago. This is the moment to learn.</p>
         </div>
       </div>
 
-      <!-- ── 2. MONTHLY MEETUP ───────────────────────────────────────── -->
+      <!-- 2. Meetup -->
       <div class="section">
         <div class="card">
           <div class="meetup-badge">📅 Monthly meetup</div>
           <h2>Join the Drone Collective</h2>
-          <p>
-            Every month we get together to fly, hack, and share. Bring your quad, your
-            fixed-wing, your ground rover, or just your curiosity. Talks, live demos,
-            and a sanctioned fly-zone at every event.
-          </p>
+          <p>Every month we get together to fly, hack, and share. Bring your quad, your fixed-wing, your ground rover, or just your curiosity. Talks, live demos, and a sanctioned fly-zone at every event.</p>
           <hr class="rule">
           <div class="link-grid">
             <a href="YOUR_MEETUP_LINK" class="link-card">
               <span class="link-icon">🗓️</span>
-              <span>
-                <span class="link-title">Meetup page</span>
-                <span class="link-desc">RSVP, location & upcoming sessions</span>
-              </span>
+              <span><span class="link-title">Meetup page</span><span class="link-desc">RSVP, location &amp; upcoming sessions</span></span>
             </a>
             <a href="YOUR_DISCORD_LINK" class="link-card">
               <span class="link-icon">💬</span>
-              <span>
-                <span class="link-title">Discord server</span>
-                <span class="link-desc">Real-time chat, build logs & help</span>
-              </span>
+              <span><span class="link-title">Discord server</span><span class="link-desc">Real-time chat, build logs &amp; help</span></span>
             </a>
             <a href="YOUR_FLYER_PDF" class="link-card">
               <span class="link-icon">📄</span>
-              <span>
-                <span class="link-title">Event flyer</span>
-                <span class="link-desc">Download & share the latest flyer</span>
-              </span>
+              <span><span class="link-title">Event flyer</span><span class="link-desc">Download &amp; share the latest flyer</span></span>
             </a>
             <a href="YOUR_CALENDAR_LINK" class="link-card">
               <span class="link-icon">🔔</span>
-              <span>
-                <span class="link-title">Add to calendar</span>
-                <span class="link-desc">Never miss a fly day</span>
-              </span>
+              <span><span class="link-title">Add to calendar</span><span class="link-desc">Never miss a fly day</span></span>
             </a>
           </div>
         </div>
       </div>
 
-      <!-- ── 3. GETTING STARTED WITH AUTONOMOUS FLIGHT ──────────────── -->
+      <!-- 3. Getting started -->
       <div class="section">
         <div class="card">
           <p class="card-label">Start here</p>
           <h2>How to automate your first flight</h2>
-          <p>
-            You don't need to write a flight controller from scratch. The ecosystem
-            already exists — your job is to learn the layers and glue them together.
-          </p>
+          <p>You don't need to write a flight controller from scratch. The ecosystem already exists — your job is to learn the layers and glue them together.</p>
           <div class="steps">
             <div class="step">
               <div class="step-num">1</div>
-              <div class="step-body">
-                <h3>Pick a flight stack</h3>
-                <p>ArduPilot or PX4 both run on cheap hardware and speak MAVLink.
-                   ArduPilot has a larger hobbyist community; PX4 is common in research.</p>
-              </div>
+              <div class="step-body"><h3>Pick a flight stack</h3><p>ArduPilot or PX4 both run on cheap hardware and speak MAVLink. ArduPilot has a larger hobbyist community; PX4 is common in research.</p></div>
             </div>
             <div class="step">
               <div class="step-num">2</div>
-              <div class="step-body">
-                <h3>Simulate before you fly</h3>
-                <p>SITL (Software In The Loop) lets you run ArduPilot inside Gazebo or
-                   Mission Planner on your laptop — crash virtually, learn fast.</p>
-              </div>
+              <div class="step-body"><h3>Simulate before you fly</h3><p>SITL (Software In The Loop) lets you run ArduPilot inside Gazebo or Mission Planner on your laptop — crash virtually, learn fast.</p></div>
             </div>
             <div class="step">
               <div class="step-num">3</div>
-              <div class="step-body">
-                <h3>Talk to it with DroneKit or MAVSDK</h3>
-                <p>Python libraries that wrap MAVLink. A ten-line script can arm, take off,
-                   fly a waypoint mission, and land.</p>
-              </div>
+              <div class="step-body"><h3>Talk to it with DroneKit or MAVSDK</h3><p>Python libraries that wrap MAVLink. A ten-line script can arm, take off, fly a waypoint mission, and land.</p></div>
             </div>
             <div class="step">
               <div class="step-num">4</div>
-              <div class="step-body">
-                <h3>Add a companion computer</h3>
-                <p>A Raspberry Pi or Jetson Nano sits on the drone and runs your vision
-                   pipeline. It sends velocity or position commands to the flight controller
-                   over a serial or USB MAVLink link.</p>
-              </div>
+              <div class="step-body"><h3>Add a companion computer</h3><p>A Raspberry Pi or Jetson Nano sits on the drone and runs your vision pipeline, sending velocity commands to the flight controller over MAVLink.</p></div>
             </div>
             <div class="step">
               <div class="step-num">5</div>
-              <div class="step-body">
-                <h3>Close the loop with a camera</h3>
-                <p>OpenCV + AprilTags (or YOLO for object detection) gives the drone
-                   a reference frame. Now it can see and react — precision landing,
-                   follow-me, obstacle avoidance.</p>
-              </div>
+              <div class="step-body"><h3>Close the loop with a camera</h3><p>OpenCV + AprilTags (or YOLO for object detection) gives the drone a reference frame. Now it can see and react — precision landing, follow-me, obstacle avoidance.</p></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- ── 4. REPOS & CODE ─────────────────────────────────────────── -->
+      <!-- 4. Repos -->
       <div class="section">
         <div class="card">
           <p class="card-label">Open source</p>
-          <h2>Code & resources</h2>
+          <h2>Code &amp; resources</h2>
           <p>Everything below is open — clone it, break it, send a PR.</p>
           <div class="link-grid">
             <a href="YOUR_REPO_1" class="link-card">
               <span class="link-icon">⚙️</span>
-              <span>
-                <span class="link-title">Flight controller firmware</span>
-                <span class="link-desc">C++ / Arduino — ESP32 &amp; STM32 examples</span>
-              </span>
+              <span><span class="link-title">Flight controller firmware</span><span class="link-desc">C++ / Arduino — ESP32 &amp; STM32 examples</span></span>
             </a>
             <a href="YOUR_REPO_2" class="link-card">
               <span class="link-icon">🐍</span>
-              <span>
-                <span class="link-title">Ground station scripts</span>
-                <span class="link-desc">Python · MAVLink · mission planning</span>
-              </span>
+              <span><span class="link-title">Ground station scripts</span><span class="link-desc">Python · MAVLink · mission planning</span></span>
             </a>
             <a href="YOUR_REPO_3" class="link-card">
               <span class="link-icon">👁️</span>
-              <span>
-                <span class="link-title">Vision pipeline</span>
-                <span class="link-desc">OpenCV · AprilTag detection · YOLO</span>
-              </span>
+              <span><span class="link-title">Vision pipeline</span><span class="link-desc">OpenCV · AprilTag detection · YOLO</span></span>
             </a>
             <a href="YOUR_REPO_4" class="link-card">
               <span class="link-icon">🌐</span>
-              <span>
-                <span class="link-title">Web dashboard</span>
-                <span class="link-desc">Live telemetry · map overlay · logs</span>
-              </span>
+              <span><span class="link-title">Web dashboard</span><span class="link-desc">Live telemetry · map overlay · logs</span></span>
             </a>
             <a href="YOUR_REPO_5" class="link-card">
               <span class="link-icon">📡</span>
-              <span>
-                <span class="link-title">XIAO camera streamer</span>
-                <span class="link-desc">ESP32-S3 MJPEG WiFi stream · bare minimum</span>
-              </span>
+              <span><span class="link-title">XIAO camera streamer</span><span class="link-desc">ESP32-S3 MJPEG WiFi stream · bare minimum</span></span>
             </a>
             <a href="YOUR_DOCS_LINK" class="link-card">
               <span class="link-icon">📚</span>
-              <span>
-                <span class="link-title">Getting started guide</span>
-                <span class="link-desc">Step-by-step walkthrough for beginners</span>
-              </span>
+              <span><span class="link-title">Getting started guide</span><span class="link-desc">Step-by-step walkthrough for beginners</span></span>
             </a>
           </div>
         </div>
       </div>
 
-      <!-- ── 5. THE LANDSCAPE ────────────────────────────────────────── -->
+      <!-- 5. Landscape -->
       <div class="section">
         <div class="card">
           <p class="card-label">The landscape</p>
           <h2>Where drones are reshaping industries</h2>
-          <p>
-            Delivery networks (Wing, Zipline, Amazon), agricultural spraying and
-            surveying, infrastructure inspection (power lines, wind turbines, bridges),
-            construction progress tracking, cinematography, search and rescue —
-            the list gets longer every quarter.
-          </p>
-          <p>
-            The common thread: tasks that are dull, dirty, or dangerous for humans
-            become cheap, repeatable, and data-rich when handed to an autonomous system.
-            The bottleneck is no longer the hardware — it's software, regulation, and
-            the humans who understand both.
-          </p>
+          <p>Delivery networks (Wing, Zipline, Amazon), agricultural spraying and surveying, infrastructure inspection (power lines, wind turbines, bridges), construction progress tracking, cinematography, search and rescue — the list gets longer every quarter.</p>
+          <p>The common thread: tasks that are dull, dirty, or dangerous for humans become cheap, repeatable, and data-rich when handed to an autonomous system. The bottleneck is no longer the hardware — it's software, regulation, and the humans who understand both.</p>
           <hr class="rule">
-          <p>
-            <strong style="color:#d0e4ff">That's the gap this community fills.</strong>
-            Pilots who can write code. Developers who can fly. People who understand
-            the full stack from firmware to web dashboard to FAA Part 107.
-          </p>
+          <p><strong class="hl">That's the gap this community fills.</strong> Pilots who can write code. Developers who can fly. People who understand the full stack from firmware to web dashboard to FAA Part 107.</p>
           <a href="YOUR_NEWSLETTER_LINK" class="cta-btn">→ Get the monthly digest</a>
         </div>
       </div>
 
-      <!-- ── 6. ABOUT / CONTACT ──────────────────────────────────────── -->
-      <div class="section" style="margin-bottom: 10rem;">
+      <!-- 6. About -->
+      <div class="section">
         <div class="card">
           <p class="card-label">About</p>
           <h2>Who's behind this</h2>
-          <p>
-            A small group of engineers, hobbyists, and educators who met at a
-            hackerspace and kept showing up to fly. We're not a company — just people
-            who think autonomous flight is one of the most interesting problems of
-            the next decade and want to work on it together.
-          </p>
+          <p>A small group of engineers, hobbyists, and educators who met at a hackerspace and kept showing up to fly. We're not a company — just people who think autonomous flight is one of the most interesting problems of the next decade and want to work on it together.</p>
           <div class="link-grid">
             <a href="YOUR_GITHUB" class="link-card">
               <span class="link-icon">🐙</span>
-              <span>
-                <span class="link-title">GitHub</span>
-                <span class="link-desc">All repos in one place</span>
-              </span>
+              <span><span class="link-title">GitHub</span><span class="link-desc">All repos in one place</span></span>
             </a>
             <a href="YOUR_EMAIL" class="link-card">
               <span class="link-icon">✉️</span>
-              <span>
-                <span class="link-title">Contact</span>
-                <span class="link-desc">Talk to a human · sponsorships · venue</span>
-              </span>
+              <span><span class="link-title">Contact</span><span class="link-desc">Sponsorships · venue · collab</span></span>
             </a>
           </div>
         </div>
       </div>
 
-    </div><!-- /content -->
+      <div class="bottom-pad"></div>
+    </div><!-- /page -->
 
-    <!-- ── A-Frame + scroll scripts ──────────────────────────────────── -->
     <script>
-      /* ── hero fade out as user scrolls ─────────────────────────── */
-      const ui        = document.getElementById('ui');
-      const scrollHint = document.getElementById('scroll-hint');
-
+      /* hero + scroll hint fade */
+      const ui   = document.getElementById('ui');
+      const hint = document.getElementById('scroll-hint');
       window.addEventListener('scroll', () => {
-        const fadeStart = window.innerHeight * 0.1;
-        const fadeEnd   = window.innerHeight * 0.5;
-        const p = Math.min(Math.max((window.scrollY - fadeStart) / (fadeEnd - fadeStart), 0), 1);
-        ui.style.opacity         = 1 - p;
-        scrollHint.style.opacity = 1 - p * 3;
+        const p = Math.min(window.scrollY / (window.innerHeight * 0.4), 1);
+        ui.style.opacity   = 1 - p;
+        hint.style.opacity = Math.max(1 - p * 4, 0);
       });
 
-      /* ── morph + rotation on the backpack model ─────────────────── */
+      /* backpack morph + rotation */
       AFRAME.registerComponent('scroll-morph-control', {
         init: function () {
           this.el.addEventListener('model-loaded', () => {
@@ -636,25 +448,12 @@
           });
           window.addEventListener('scroll', () => {
             if (!this.mesh) return;
-            const scrollMax     = document.body.offsetHeight - window.innerHeight;
-            const scrollPercent = Math.min(window.scrollY / scrollMax, 1);
+            const scrollMax = document.body.scrollHeight - window.innerHeight;
+            const pct = Math.min(window.scrollY / scrollMax, 1);
             this.mesh.traverse((node) => {
-              if (node.morphTargetInfluences) {
-                node.morphTargetInfluences[0] = scrollPercent;
-              }
+              if (node.morphTargetInfluences) node.morphTargetInfluences[0] = pct;
             });
-            this.el.setAttribute('rotation', `0 ${45 + scrollPercent * 360} 0`);
-
-            /* float the 3-D panels in as user scrolls */
-            const p1 = document.querySelector('#panel-1');
-            const p2 = document.querySelector('#panel-2');
-            const p3 = document.querySelector('#panel-3');
-            if (p1) {
-              const vis = scrollPercent > 0.05 ? 1 : 0;
-              p1.setAttribute('visible', vis);
-              p2.setAttribute('visible', vis);
-              p3.setAttribute('visible', scrollPercent > 0.15 ? 1 : 0);
-            }
+            this.el.setAttribute('rotation', `0 ${45 + pct * 360} 0`);
           });
         }
       });
